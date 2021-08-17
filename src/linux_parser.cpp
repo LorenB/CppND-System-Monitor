@@ -7,6 +7,7 @@
 #include "linux_parser.h"
 
 using std::stof;
+using std::stol;
 using std::string;
 using std::to_string;
 using std::vector;
@@ -88,11 +89,24 @@ float LinuxParser::MemoryUtilization() {
       }
     }
   }  
-  return 1 - std::stof(mem_free_str)/std::stof(mem_total_str);
+  return 1 - stof(mem_free_str)/stof(mem_total_str);
 }
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() { 
+  string line;
+  string key;
+  string value;
+  string uptime;
+  string idletime;
+  std::ifstream stream(kProcDirectory + kUptimeFilename);
+  if(stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    linestream >> uptime >> idletime;
+  }
+  return stol(uptime); 
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
