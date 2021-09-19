@@ -1,3 +1,4 @@
+#include <deque>
 #include <dirent.h>
 #include <unistd.h>
 #include <sstream>
@@ -134,8 +135,39 @@ long LinuxParser::Jiffies() {
 }
 
 // TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) {
+  long result = 0;
+  string line;
+  string val;
+  int val_lng;
+  int vals_idx = 1;
+  std::deque<int> metric_idxs{14, 15, 16, 17};
+  string metric_keys[] = {"stime", "utime", "cutime", "cstime"};
+  vector<long> metrics;
+  string pidDirectory = "/" + std::to_string(pid);
+  std::ifstream stream(kProcDirectory +  pidDirectory + kStatFilename);
+  int metrics_idx = metric_idxs.front();
+  metric_idxs.pop_front();
+  if(stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    while(linestream >> val) {
+      if(vals_idx == metrics_idx) {
+        val_lng = std::stoi(val);
+        metrics_idx = metric_idxs.front();
+        metric_idxs.pop_front();
+        metrics.push_back(val_lng);
+      }
+      vals_idx += 1;
+    }
+  }
+
+  for (auto& n : metrics) {
+    result += n;
+  }
+
+  return result;
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() {
