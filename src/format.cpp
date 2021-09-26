@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <string>
 #include <time.h>
 
@@ -11,6 +12,7 @@ using std::string;
 string Format::ElapsedTime(long seconds) {
     time_t time_seconds(seconds);
     tm *p = gmtime(&time_seconds);
-    string result = std::to_string(p->tm_hour) + ":" + std::to_string(p->tm_min) + ":" + std::to_string(p->tm_sec);
+    char result[8];
+    sprintf(result, "%02d:%02d:%02d", p->tm_hour, p->tm_min, p->tm_sec);
     return result;
 }
