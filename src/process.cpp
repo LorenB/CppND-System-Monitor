@@ -20,8 +20,57 @@ int Process::Pid() {
     return pid_;
 }
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+// Return this process's CPU utilization
+float Process::CpuUtilization() {
+    long hertz = sysconf(_SC_CLK_TCK);
+    string line;
+    string key;
+    string val_raw;
+    float val;
+    int vals_idx = 1;
+    std::deque<int> metric_idxs{14, 15, 22};
+    int metrics_idx = metric_idxs.front();
+    metric_idxs.pop_front();
+    vector<long> metrics;
+    string pidDirectory = std::to_string(pid_);
+    std::ifstream stream(LinuxParser::kProcDirectory + pidDirectory + LinuxParser::kStatFilename);
+    if (stream.is_open()) {
+        std::getline(stream, line);
+        std::istringstream linestream(line);
+        while(linestream >> val_raw) {
+            // std::cout << vals_idx << " ";
+            if(vals_idx == metrics_idx) {
+                val = std::stof(val_raw);
+                metrics_idx = metric_idxs.front();
+                metric_idxs.pop_front();
+                metrics.push_back(val);
+            }
+            vals_idx++;
+        }
+    }
+    float utime = metrics[0];
+    float stime = metrics[1];
+    float starttime = metrics[2];
+
+
+    float uptime;
+    std::ifstream stream_uptime(LinuxParser::kProcDirectory + LinuxParser::kUptimeFilename);
+    if(stream_uptime.is_open()) {
+        std::getline(stream_uptime, line);
+        std::istringstream linestream_uptime(line);
+        linestream_uptime >> val_raw;
+        uptime = std::stof(val_raw);
+    }
+    // std::cout << "uptime: " << uptime << std::endl;
+
+    float total_time = utime + stime;
+    // std::cout << "total seconds: " << total_time / hertz << std::endl;
+    float seconds = uptime - (starttime / hertz);
+    // std::cout << "elapsed seconds: " << seconds << std::endl;
+    float ret = (total_time / hertz) / seconds;
+    // std::cout << "utilization: " << ret << std::endl;
+    return ret;
+}
 
 // Return the command that generated this process
 string Process::Command() {
