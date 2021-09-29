@@ -139,7 +139,7 @@ long LinuxParser::ActiveJiffies(int pid) {
   long result = 0;
   string line;
   string val;
-  int val_lng;
+  long val_lng;
   int vals_idx = 1;
   std::deque<int> metric_idxs{14, 15, 16, 17};
   string metric_keys[] = {"stime", "utime", "cutime", "cstime"};
@@ -153,7 +153,7 @@ long LinuxParser::ActiveJiffies(int pid) {
     std::istringstream linestream(line);
     while(linestream >> val) {
       if(vals_idx == metrics_idx) {
-        val_lng = std::stoi(val);
+        val_lng = std::stol(val);
         metrics_idx = metric_idxs.front();
         metric_idxs.pop_front();
         metrics.push_back(val_lng);
@@ -242,7 +242,6 @@ int LinuxParser::TotalProcesses() {
 }
 
 // Read and return the number of running processes
-// TODO: verify
 int LinuxParser::RunningProcesses() {
   string line;
   string key;
@@ -291,7 +290,7 @@ string LinuxParser::Ram(int pid) {
       }
     }
   }
-  return string("?");
+  return string();
 }
 
 
