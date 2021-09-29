@@ -38,7 +38,6 @@ float Process::CpuUtilization() {
         std::getline(stream, line);
         std::istringstream linestream(line);
         while(linestream >> val_raw) {
-            // std::cout << vals_idx << " ";
             if(vals_idx == metrics_idx) {
                 val = std::stof(val_raw);
                 metrics_idx = metric_idxs.front();
@@ -61,14 +60,10 @@ float Process::CpuUtilization() {
         linestream_uptime >> val_raw;
         uptime = std::stof(val_raw);
     }
-    // std::cout << "uptime: " << uptime << std::endl;
 
     float total_time = utime + stime;
-    // std::cout << "total seconds: " << total_time / hertz << std::endl;
     float seconds = uptime - (starttime / hertz);
-    // std::cout << "elapsed seconds: " << seconds << std::endl;
     float ret = (total_time / hertz) / seconds;
-    // std::cout << "utilization: " << ret << std::endl;
     return ret;
 }
 
