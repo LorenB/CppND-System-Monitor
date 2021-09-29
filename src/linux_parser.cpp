@@ -261,7 +261,6 @@ int LinuxParser::RunningProcesses() {
   return 0;
 }
 
-// TODO: debug why only first line populates
 // Read and return the command associated with a process
 string LinuxParser::Command(int pid) {
   string line;
@@ -274,7 +273,6 @@ string LinuxParser::Command(int pid) {
   return string("unkown");
 }
 
-// TODO: debug why only first line populates
 // Read and return the memory used by a process
 string LinuxParser::Ram(int pid) {
   string result;
@@ -297,7 +295,7 @@ string LinuxParser::Ram(int pid) {
 }
 
 
-// TODO: Read and return the user ID associated with a process
+// Read and return the user ID associated with a process
 string LinuxParser::Uid(int pid) {
   string line;
   string key;
@@ -316,7 +314,7 @@ string LinuxParser::Uid(int pid) {
   return string();
 }
 
-// TODO: Read and return the user associated with a process
+// Read and return the user associated with a process
 string LinuxParser::User(int pid) {
   string result;
   string line;
@@ -350,7 +348,7 @@ string LinuxParser::User(int pid) {
 }
 
 
-// TODO: Read and return the uptime of a process
+// Read and return the uptime of a process
 long LinuxParser::UpTime(int pid) {
   string line;
   string val;
