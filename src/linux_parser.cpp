@@ -219,9 +219,6 @@ long LinuxParser::IdleJiffies() {
   return result;
 }
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
-
 // Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
   string line;
