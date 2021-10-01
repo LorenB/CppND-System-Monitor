@@ -275,6 +275,7 @@ string LinuxParser::Ram(int pid) {
   string line;
   string key;
   string val;
+  int val_mb;
   string units;
   string pidDirectory = std::to_string(pid);
   std::ifstream stream(kProcDirectory + pidDirectory + kStatusFilename);
@@ -283,7 +284,12 @@ string LinuxParser::Ram(int pid) {
       if (line.rfind("VmSize:", 0) == 0) {
         std::istringstream linestream(line);
         linestream >> key >> val >> units;
-        return val + " " + units;
+        if(units == "kB") {
+          val_mb =  std::stoi(val) / 1024;
+          return std::to_string(val_mb) + " MB";
+        } else {
+         return val + " " + units;
+        }
       }
     }
   }
