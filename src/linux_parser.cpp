@@ -363,7 +363,7 @@ long LinuxParser::UpTime(int pid) {
     std::istringstream linestream(line);
     while(linestream >> val) {
       if (val_idx == 22) {
-        seconds = std::stol(val) / sysconf(_SC_CLK_TCK);
+        seconds  = LinuxParser::UpTime() - ( std::stol(val) / sysconf(_SC_CLK_TCK) );
         return seconds;
       }
       val_idx++;
