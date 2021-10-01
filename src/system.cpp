@@ -24,8 +24,15 @@ vector<Process>& System::Processes() {
     for (auto pid : pids) {
         Process process;
         process.setPid(pid);
-        processes_.push_back(process);
-
+        if(
+            !process.User().empty() &&
+            process.CpuUtilization() > 0.0 &&
+            !process.Ram().empty() &&
+            process.UpTime() > 0 &&
+            !process.Command().empty()
+        ) {
+            processes_.push_back(process);
+        }
     }
 
     return processes_;
