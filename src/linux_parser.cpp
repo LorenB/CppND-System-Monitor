@@ -82,9 +82,9 @@ float LinuxParser::MemoryUtilization() {
     while(std::getline(stream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
-        if(key == "MemTotal:") {
+        if(key == kFilterMemTotalString) {
           mem_total_str = value;
-        } else if (key == "MemFree:") {
+        } else if (key == kFilterMemFreeString) {
             mem_free_str = value;
         }
       }
@@ -124,7 +124,7 @@ long LinuxParser::Jiffies() {
     std::ifstream stream(kProcDirectory + kStatFilename);
     if (stream.is_open()) {
       while(std::getline(stream, line)) {
-        if (line.rfind("cpu ", 0) == 0) {
+        if (line.rfind(kFilterCpu, 0) == 0) {
           std::istringstream linestream(line);
           linestream >> key >> cpu_user >> cpu_nice >> cpu_system >> cpu_idle >> cpu_iowait >> cpu_irq >> cpu_softirq;
         }
@@ -227,7 +227,7 @@ int LinuxParser::TotalProcesses() {
   std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     while(std::getline(stream, line)) {
-      if (line.rfind("processes ", 0) == 0) { // pos=0 limits the search to the prefix
+      if (line.rfind(kFilterProcesses, 0) == 0) { // pos=0 limits the search to the prefix
         std::istringstream linesteam(line);
         linesteam >> key >> val;
         return val;
@@ -246,7 +246,7 @@ int LinuxParser::RunningProcesses() {
   std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     while(std::getline(stream, line)) {
-      if (line.rfind("procs_running ", 0) == 0) { // pos=0 limits the search to the prefix
+      if (line.rfind(kFilterRunningProcesses, 0) == 0) { // pos=0 limits the search to the prefix
         std::istringstream linesteam(line);
         linesteam >> key >> val;
         return val;
@@ -281,7 +281,7 @@ string LinuxParser::Ram(int pid) {
   std::ifstream stream(kProcDirectory + pidDirectory + kStatusFilename);
   if(stream.is_open()) {
     while(std::getline(stream, line)) {
-      if (line.rfind("VmSize:", 0) == 0) {
+      if (line.rfind(kFilterProcMem, 0) == 0) {
         std::istringstream linestream(line);
         linestream >> key >> val >> units;
         if(units == "kB") {
@@ -306,7 +306,7 @@ string LinuxParser::Uid(int pid) {
   std::ifstream stream(kProcDirectory + pidDirectory + kStatusFilename);
   if(stream.is_open()) {
      while(std::getline(stream, line)) {
-        if (line.rfind("Uid:", 0) == 0) {
+        if (line.rfind(kFilterUID, 0) == 0) {
           std::istringstream linestream(line);
           linestream >> key >> val;
           return val;
