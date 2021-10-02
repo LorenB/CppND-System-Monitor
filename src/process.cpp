@@ -28,7 +28,7 @@ float Process::CpuUtilization() {
     string val_raw;
     float val;
     int vals_idx = 1;
-    std::deque<int> metric_idxs{14, 15, 22};
+    std::deque<int> metric_idxs{14, 15, 16, 17, 22};
     int metrics_idx = metric_idxs.front();
     metric_idxs.pop_front();
     vector<long> metrics;
@@ -49,7 +49,9 @@ float Process::CpuUtilization() {
     }
     float utime = metrics[0];
     float stime = metrics[1];
-    float starttime = metrics[2];
+    float cutime = metrics[2];
+    float cstime = metrics[3];
+    float starttime = metrics[4];
 
 
     float uptime;
@@ -61,7 +63,7 @@ float Process::CpuUtilization() {
         uptime = std::stof(val_raw);
     }
 
-    float total_time = utime + stime;
+    float total_time = utime + stime + cstime + cutime;
     float seconds = uptime - (starttime / hertz);
     float ret = (total_time / hertz) / seconds;
     return ret;
