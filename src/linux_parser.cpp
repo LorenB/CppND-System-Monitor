@@ -33,6 +33,7 @@ string LinuxParser::OperatingSystem() {
       }
     }
   }
+  filestream.close();
   return value;
 }
 
@@ -46,6 +47,7 @@ string LinuxParser::Kernel() {
     std::istringstream linestream(line);
     linestream >> os >> version >> kernel;
   }
+  stream.close();
   return kernel;
 }
 
@@ -113,27 +115,27 @@ long LinuxParser::UpTime() {
 
 // Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() {
-    std::string line;
-    std::string key;
-    float cpu_user;
-    float cpu_nice;
-    float cpu_system;
-    float cpu_idle;
-    float cpu_iowait;
-    float cpu_irq;
-    float cpu_softirq;
+  std::string line;
+  std::string key;
+  float cpu_user;
+  float cpu_nice;
+  float cpu_system;
+  float cpu_idle;
+  float cpu_iowait;
+  float cpu_irq;
+  float cpu_softirq;
 
-    std::ifstream stream(kProcDirectory + kStatFilename);
-    if (stream.is_open()) {
-      while(std::getline(stream, line)) {
-        if (line.rfind(kFilterCpu, 0) == 0) {
-          std::istringstream linestream(line);
-          linestream >> key >> cpu_user >> cpu_nice >> cpu_system >> cpu_idle >> cpu_iowait >> cpu_irq >> cpu_softirq;
-        }
+  std::ifstream stream(kProcDirectory + kStatFilename);
+  if (stream.is_open()) {
+    while(std::getline(stream, line)) {
+      if (line.rfind(kFilterCpu, 0) == 0) {
+        std::istringstream linestream(line);
+        linestream >> key >> cpu_user >> cpu_nice >> cpu_system >> cpu_idle >> cpu_iowait >> cpu_irq >> cpu_softirq;
       }
     }
-  float result = cpu_user + cpu_nice + cpu_system + cpu_idle + cpu_iowait + cpu_irq + cpu_softirq;
+  }
   stream.close();
+  float result = cpu_user + cpu_nice + cpu_system + cpu_idle + cpu_iowait + cpu_irq + cpu_softirq;
   return result;
 }
 
@@ -164,11 +166,10 @@ long LinuxParser::ActiveJiffies(int pid) {
       vals_idx += 1;
     }
   }
-
+  stream.close();
   for (auto& n : metrics) {
     result += n;
   }
-  stream.close();
   return result;
 }
 
@@ -193,8 +194,8 @@ long LinuxParser::ActiveJiffies() {
       }
     }
   }
-  float result = cpu_user + cpu_nice + cpu_system  + cpu_iowait + cpu_irq + cpu_softirq;
   stream.close();
+  float result = cpu_user + cpu_nice + cpu_system  + cpu_iowait + cpu_irq + cpu_softirq;
   return result;
 }
 
@@ -219,13 +220,14 @@ long LinuxParser::IdleJiffies() {
       }
     }
   }
-  float result = cpu_idle;
   stream.close();
+  float result = cpu_idle;
   return result;
 }
 
 // Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
+  int result = 0;
   string line;
   string key;
   int val;
@@ -235,17 +237,18 @@ int LinuxParser::TotalProcesses() {
       if (line.rfind(kFilterProcesses, 0) == 0) { // pos=0 limits the search to the prefix
         std::istringstream linesteam(line);
         linesteam >> key >> val;
-        return val;
+        result = val;
+        break;
       }
     }
-
   }
   stream.close();
-  return 0;
+  return result;
 }
 
 // Read and return the number of running processes
 int LinuxParser::RunningProcesses() {
+  int result = 0;
   string line;
   string key;
   int val;
@@ -255,26 +258,27 @@ int LinuxParser::RunningProcesses() {
       if (line.rfind(kFilterRunningProcesses, 0) == 0) { // pos=0 limits the search to the prefix
         std::istringstream linesteam(line);
         linesteam >> key >> val;
-        return val;
+        result = val;
+        break;
       }
     }
-
   }
   stream.close();
-  return 0;
+  return result;
 }
 
 // Read and return the command associated with a process
 string LinuxParser::Command(int pid) {
+  string result = "";
   string line;
   string pidDirectory = std::to_string(pid);
   std::ifstream stream(kProcDirectory + pidDirectory + kCmdlineFilename);
   if(stream.is_open()) {
     std::getline(stream, line);
-    return line;
+    result = line;
   }
   stream.close();
-  return string("");
+  return result;
 }
 
 // Read and return the memory used by a process
@@ -294,20 +298,22 @@ string LinuxParser::Ram(int pid) {
         linestream >> key >> val >> units;
         if(units == "kB") {
           val_mb =  std::stoi(val) / 1024;
-          return std::to_string(val_mb) + " MB";
+          result = std::to_string(val_mb) + " MB";
         } else {
-         return val + " " + units;
+         result = val + " " + units;
         }
+        break;
       }
     }
   }
   stream.close();
-  return string();
+  return result;
 }
 
 
 // Read and return the user ID associated with a process
 string LinuxParser::Uid(int pid) {
+  string result =  "";
   string line;
   string key;
   string val;
@@ -318,17 +324,18 @@ string LinuxParser::Uid(int pid) {
         if (line.rfind(kFilterUID, 0) == 0) {
           std::istringstream linestream(line);
           linestream >> key >> val;
-          return val;
+          result = val;
+          break;
         }
       }
   }
   stream.close();
-  return string();
+  return result;
 }
 
 // Read and return the user associated with a process
 string LinuxParser::User(int pid) {
-  string result;
+  string result = "";
   string line;
   string key;
   string val;
@@ -349,7 +356,7 @@ string LinuxParser::User(int pid) {
           result = token;
         }
         if (token_num == 2 && token == uid) {
-          return result;
+          break;
         }
         line.erase(0, pos + delimiter.length());
         token_num++;
@@ -357,12 +364,13 @@ string LinuxParser::User(int pid) {
     }
   }
   stream.close();
-  return string("");
+  return result;
 }
 
 
 // Read and return the uptime of a process
 long LinuxParser::UpTime(int pid) {
+  long result = 0;
   string line;
   string val;
   long seconds;
@@ -375,11 +383,11 @@ long LinuxParser::UpTime(int pid) {
     while(linestream >> val) {
       if (val_idx == 22) {
         seconds  = LinuxParser::UpTime() - ( std::stol(val) / sysconf(_SC_CLK_TCK) );
-        return seconds;
+        result = seconds;
       }
       val_idx++;
     }
   }
   stream.close();
-  return 0;
+  return result;
 }
