@@ -23,7 +23,7 @@ const std::string kFilterMemTotalString("MemTotal:");
 const std::string kFilterMemFreeString("MemFree:");
 const std::string kFilterCpu("cpu ");
 const std::string kFilterUID("Uid:");
-const std::string kFilterProcMem("VmSize:");
+const std::string kFilterProcMem("VmRSS:");
 
 // System
 float MemoryUtilization();
