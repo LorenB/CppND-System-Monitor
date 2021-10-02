@@ -89,7 +89,8 @@ float LinuxParser::MemoryUtilization() {
         }
       }
     }
-  }  
+  }
+  stream.close();
   return 1 - stof(mem_free_str)/stof(mem_total_str);
 }
 
@@ -106,6 +107,7 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime >> idletime;
   }
+  stream.close();
   return stol(uptime); 
 }
 
@@ -131,6 +133,7 @@ long LinuxParser::Jiffies() {
       }
     }
   float result = cpu_user + cpu_nice + cpu_system + cpu_idle + cpu_iowait + cpu_irq + cpu_softirq;
+  stream.close();
   return result;
 }
 
@@ -165,7 +168,7 @@ long LinuxParser::ActiveJiffies(int pid) {
   for (auto& n : metrics) {
     result += n;
   }
-
+  stream.close();
   return result;
 }
 
@@ -191,6 +194,7 @@ long LinuxParser::ActiveJiffies() {
     }
   }
   float result = cpu_user + cpu_nice + cpu_system  + cpu_iowait + cpu_irq + cpu_softirq;
+  stream.close();
   return result;
 }
 
@@ -216,6 +220,7 @@ long LinuxParser::IdleJiffies() {
     }
   }
   float result = cpu_idle;
+  stream.close();
   return result;
 }
 
@@ -235,6 +240,7 @@ int LinuxParser::TotalProcesses() {
     }
 
   }
+  stream.close();
   return 0;
 }
 
@@ -254,6 +260,7 @@ int LinuxParser::RunningProcesses() {
     }
 
   }
+  stream.close();
   return 0;
 }
 
@@ -266,7 +273,8 @@ string LinuxParser::Command(int pid) {
     std::getline(stream, line);
     return line;
   }
-  return string("unkown");
+  stream.close();
+  return string("");
 }
 
 // Read and return the memory used by a process
@@ -293,6 +301,7 @@ string LinuxParser::Ram(int pid) {
       }
     }
   }
+  stream.close();
   return string();
 }
 
@@ -313,6 +322,7 @@ string LinuxParser::Uid(int pid) {
         }
       }
   }
+  stream.close();
   return string();
 }
 
@@ -346,7 +356,8 @@ string LinuxParser::User(int pid) {
       }
     }
   }
-  return string("unkown");
+  stream.close();
+  return string("");
 }
 
 
@@ -369,5 +380,6 @@ long LinuxParser::UpTime(int pid) {
       val_idx++;
     }
   }
+  stream.close();
   return 0;
 }
