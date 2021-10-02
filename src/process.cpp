@@ -42,7 +42,7 @@ float Process::CpuUtilization() {
                 val = std::stof(val_raw);
                 metrics_idx = metric_idxs.front();
                 metric_idxs.pop_front();
-                metrics.push_back(val);
+                metrics.emplace_back(val);
             }
             vals_idx++;
         }

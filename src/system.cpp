@@ -31,7 +31,7 @@ vector<Process>& System::Processes() {
             process.UpTime() > 0 &&
             !process.Command().empty()
         ) {
-            processes_.push_back(process);
+            processes_.emplace_back(process);
         }
     }
 

@@ -61,7 +61,7 @@ vector<int> LinuxParser::Pids() {
       string filename(file->d_name);
       if (std::all_of(filename.begin(), filename.end(), isdigit)) {
         int pid = stoi(filename);
-        pids.push_back(pid);
+        pids.emplace_back(pid);
       }
     }
   }
@@ -156,7 +156,7 @@ long LinuxParser::ActiveJiffies(int pid) {
         val_lng = std::stol(val);
         metrics_idx = metric_idxs.front();
         metric_idxs.pop_front();
-        metrics.push_back(val_lng);
+        metrics.emplace_back(val_lng);
       }
       vals_idx += 1;
     }
