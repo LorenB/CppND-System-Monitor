@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 #include "linux_parser.h"
 
 using std::stof;
@@ -338,17 +336,15 @@ string LinuxParser::Uid(int pid) {
 // Read and return the user associated with a process
 string LinuxParser::User(int pid) {
   string result = "";
+  string user;
   string line;
   string key;
   string val;
-  bool exit_loop = false;
   std::ifstream stream(kPasswordPath);
   size_t pos;
   string delimiter = ":";
   int token_num;
   string uid = LinuxParser::Uid(pid);
-  // std::cout << "uid: " << uid << std::endl;
-  int i = 0;
   if(stream.is_open()) {
     while(std::getline(stream, line)) {
       pos = 0;
@@ -357,25 +353,22 @@ string LinuxParser::User(int pid) {
       while ((pos = line.find(delimiter)) != std::string::npos) {
         token = line.substr(0, pos);
         if(token_num == 0) {
-          result = token;
+          user = token;
         }
         if (token_num == 2 && token == uid) {
-          std::cout << "result in loop: " << result << std::endl;
-          exit_loop = true;
+          result = user;
           break;
-          // return result;
         }
 
         line.erase(0, pos + delimiter.length());
         token_num++;
       }
-      if (exit_loop) {
+      if(!result.empty()) {
         break;
       }
     }
   }
   stream.close();
-  std::cout << "result in outer function: " << result << std::endl;
   return result;
 }
 
