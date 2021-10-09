@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 #include "linux_parser.h"
 
 using std::stof;
@@ -313,24 +315,24 @@ string LinuxParser::Ram(int pid) {
 
 // Read and return the user ID associated with a process
 string LinuxParser::Uid(int pid) {
-  string result =  "";
   string line;
   string key;
   string val;
   string pidDirectory = std::to_string(pid);
   std::ifstream stream(kProcDirectory + pidDirectory + kStatusFilename);
+  // std::cout << "file: " << kProcDirectory + pidDirectory + kStatusFilename << std::endl;
   if(stream.is_open()) {
      while(std::getline(stream, line)) {
+      //  std::cout << line << std::endl;
         if (line.rfind(kFilterUID, 0) == 0) {
           std::istringstream linestream(line);
           linestream >> key >> val;
-          result = val;
-          break;
+          return val;
         }
       }
   }
   stream.close();
-  return result;
+  return string();
 }
 
 // Read and return the user associated with a process
@@ -339,12 +341,14 @@ string LinuxParser::User(int pid) {
   string line;
   string key;
   string val;
+  bool exit_loop = false;
   std::ifstream stream(kPasswordPath);
   size_t pos;
   string delimiter = ":";
   int token_num;
   string uid = LinuxParser::Uid(pid);
-
+  // std::cout << "uid: " << uid << std::endl;
+  int i = 0;
   if(stream.is_open()) {
     while(std::getline(stream, line)) {
       pos = 0;
@@ -356,17 +360,24 @@ string LinuxParser::User(int pid) {
           result = token;
         }
         if (token_num == 2 && token == uid) {
+          std::cout << "result in loop: " << result << std::endl;
+          exit_loop = true;
           break;
+          // return result;
         }
+
         line.erase(0, pos + delimiter.length());
         token_num++;
+      }
+      if (exit_loop) {
+        break;
       }
     }
   }
   stream.close();
+  std::cout << "result in outer function: " << result << std::endl;
   return result;
 }
-
 
 // Read and return the uptime of a process
 long LinuxParser::UpTime(int pid) {
