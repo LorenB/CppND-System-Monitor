@@ -336,7 +336,7 @@ string LinuxParser::Uid(int pid) {
 // Read and return the user associated with a process
 string LinuxParser::User(int pid) {
   string result = "";
-  string user;
+  bool result_found = false;
   string line;
   string key;
   string val;
@@ -353,23 +353,27 @@ string LinuxParser::User(int pid) {
       while ((pos = line.find(delimiter)) != std::string::npos) {
         token = line.substr(0, pos);
         if(token_num == 0) {
-          user = token;
+          result = token;
         }
         if (token_num == 2 && token == uid) {
-          result = user;
+          result_found  = true;
           break;
         }
 
         line.erase(0, pos + delimiter.length());
         token_num++;
       }
-      if(!result.empty()) {
+      if(result_found) {
         break;
       }
     }
   }
   stream.close();
-  return result;
+  if(result_found) {
+    return result;
+  } else {
+    return string();
+  }
 }
 
 // Read and return the uptime of a process
