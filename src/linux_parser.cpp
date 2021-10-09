@@ -370,6 +370,9 @@ string LinuxParser::User(int pid) {
   }
   stream.close();
   if(result_found) {
+    if(result.size() > 6) {
+      return result.substr(0, 6) + "+";
+    }
     return result;
   } else {
     return string();
